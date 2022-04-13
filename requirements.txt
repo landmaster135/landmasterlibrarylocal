@@ -1,0 +1,5 @@
+janome==0.4.1
+# tkinter
+glob2>=0.7
+opencv-python>=4.5.5.62
+matplotlib>=3.4.3

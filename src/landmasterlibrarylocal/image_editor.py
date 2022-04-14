@@ -1,14 +1,41 @@
 # image_editor.py
 # code in shift-jis
 
+# Library by default
 import os, sys
+import math
+import subprocess
+import pathlib
+import shutil
+# Library by third party
 import cv2 # opencv 3.4.2
-# IMPORT module FROM LandmasterLibrary
-import input_controller
-import dir_editor
-sep = dir_editor.decide_seperator() # String seperator of directory.
-import file_list_getter
-import text_editor
+import pandas as pd
+from PIL import Image
+# Library by landmasterlibrary
+# import input_controller
+# import dir_editor
+# sep = dir_editor.decide_seperator() # String seperator of directory.
+# import file_list_getter
+# import text_editor
+
+# import src.landmasterlibrary.input_controller as input_controller
+# import src.landmasterlibrary.dir_editor as dir_editor
+# from .input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
+# from .dir_editor import decide_seperator, make_directory, generate_file_name
+
+# sep = dir_editor.decide_seperator() # String seperator of directory.
+# sep = decide_seperator() # String seperator of directory.
+
+# import src.landmasterlibrary.file_list_getter as file_list_getter
+# import src.landmasterlibrary.text_editor as text_editor
+# from .file_list_getter import get_file_list
+# from .text_editor import write_text
+
+from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
+from dir_editor import decide_seperator, make_directory, generate_file_name, decide_now_dir
+sep = decide_seperator() # String seperator of directory.
+from file_list_getter import get_file_list
+from text_editor import write_text
 
 def select_area(filename : str) -> dict:
     '''
@@ -104,7 +131,7 @@ def trim_image(trimmed_img_ext : str = "jpg"):
     trimmed_img_ext          : String of extension of trimmed_img.
     trimmed_img_name         : String of filename of trimmed_img.
     '''
-    file_list = file_list_getter.get_file_list(dir_editor.decide_now_dir(),trimmed_img_ext)
+    file_list = get_file_list(decide_now_dir(),trimmed_img_ext)
 
     # Error Handling
     if len(file_list) == 0:
@@ -114,12 +141,12 @@ def trim_image(trimmed_img_ext : str = "jpg"):
     # selectTimes = input('What times do you choosing? ("1" or "every"): ')
     # while selectTimes != '1' and selectTimes != 'every':
     #     selectTimes = input('Retry. ("1" or "every"): ')
-    select_times = input_controller.repeat_input_with_multi_choices('\nWhat times do you choosing? ("1" or "every"): ', ['1', 'every'])
+    select_times = repeat_input_with_multi_choices('\nWhat times do you choosing? ("1" or "every"): ', ['1', 'every'])
 
-    extracted_dir = dir_editor.make_directory(file_list[0])
+    extracted_dir = make_directory(file_list[0])
 
     # Error Handling
-    if input_controller.check_whether_sjis_exists([file_list[0], extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([file_list[0], extracted_dir], __file__) == True:
         sys.exit(0)
 
     for i in range(0, len(file_list)):
@@ -225,11 +252,11 @@ def remove_duplication(folder_list : list):
     extracted_dir = os.path.dirname(folder_list[0])
 
     # Error Handling
-    if input_controller.check_whether_sjis_exists([folder_list[0], extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([folder_list[0], extracted_dir], __file__) == True:
         sys.exit(0)
 
     # Decide to remove or don't
-    execute_mode = input_controller.repeat_input_with_multi_choices('\nYou wanna Remove or Assessment overlapped images? (R/A)', ['R', 'A'])
+    execute_mode = repeat_input_with_multi_choices('\nYou wanna Remove or Assessment overlapped images? (R/A)', ['R', 'A'])
 
     assess_mode = 'N'
     border_line = 70
@@ -240,12 +267,12 @@ def remove_duplication(folder_list : list):
         img_name_2 = os.path.splitext(os.path.basename(folder_list[i+1]))[0]
         # Decide method of assessment
         while assess_mode != 'F' and assess_mode != 'P':
-            assess_mode = input_controller.repeat_input_with_multi_choices('\nWhich method to assess?\n[ F: FeaturePoint, P: PixelMatch ] : ', ['F', 'P'])
+            assess_mode = repeat_input_with_multi_choices('\nWhich method to assess?\n[ F: FeaturePoint, P: PixelMatch ] : ', ['F', 'P'])
             if execute_mode == 'R':
                 if assess_mode == 'F':
-                    border_line = input_controller.repeat_input_with_multi_choices('How many matches are required not to remove? : ', [0, 100])
+                    border_line = repeat_input_with_multi_choices('How many matches are required not to remove? : ', [0, 100])
                 elif assess_mode == 'P':
-                    border_line = input_controller.repeat_input_with_multi_choices('How many matches are required to remove? : ', [0, 100])
+                    border_line = repeat_input_with_multi_choices('How many matches are required to remove? : ', [0, 100])
             elif execute_mode == 'S':
                 pass
         # do assessment
@@ -267,7 +294,7 @@ def remove_duplication(folder_list : list):
                 if match_rate >= border_line:
                     os.remove(folder_list[i])
     # write to .txt file
-    text_editor.write_text(dir_editor.generate_file_name(extracted_dir, sep, 'match_rate.txt'), list_for_text)
+    write_text(generate_file_name(extracted_dir, sep, 'match_rate.txt'), list_for_text)
 
     print('RemoveDuplication is terminated.\nCheck directory "{dirname}"'.format(dirname=extracted_dir))
 
@@ -284,10 +311,10 @@ def extract_image(video_name : str):
         print("ERROR: No file is selected.")
         sys.exit(0)
 
-    extracted_dir = dir_editor.make_directory(video_name)
+    extracted_dir = make_directory(video_name)
 
     # Error Handling
-    if input_controller.check_whether_sjis_exists([video_name, extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([video_name, extracted_dir], __file__) == True:
         sys.exit(0)
 
     cap = cv2.VideoCapture(video_name)
@@ -311,21 +338,163 @@ def extract_image(video_name : str):
     print('Check directory "{dirname}"'.format(dirname=extracted_dir))
     cap.release()
 
+def get_times_of_movie_in_folder(dir_full_path : str, movie_file_ext : str = "mov"):
+    # file_list = get_file_list(dir_full_path, movie_file_ext)
+    file_list = get_file_list(dir_full_path, movie_file_ext)
+    print(file_list)
+    total_time = 0
+    for file in file_list:
+        cap = cv2.VideoCapture(file)
+        frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        time = frame_count / fps
+        total_time += time
+
+    ONE_HOUR_TO_SECOND = 3600
+    ONE_MINUTE_TO_SECOND = 60
+    print(total_time)
+    hour = math.floor(total_time / ONE_HOUR_TO_SECOND)
+    minute = math.floor((total_time - ONE_HOUR_TO_SECOND * hour) / ONE_MINUTE_TO_SECOND)
+    second = math.floor(total_time - ONE_HOUR_TO_SECOND * hour - ONE_MINUTE_TO_SECOND * minute)
+    total_time_to_display = "{}:{}:{}".format(str(hour), str(minute), str(second))
+    print("Total_time is {}".format(total_time_to_display))
+
+def extract_sound_to_text(dir_full_path : str, movie_file_ext : str = "mov"):
+    # file_list = get_file_list(dir_full_path, movie_file_ext)
+    file_list = get_file_list(dir_full_path, movie_file_ext)
+    dir_name_list = dir_full_path.split("/")
+    base_dir_name = dir_name_list[len(dir_name_list) - 1]
+    sound_dir_name = "sound"
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    for file_name in file_list:
+        # TODO: dir_editor直した後に動作確認
+        output_file_name = file_name.replace(f".{movie_file_ext}", ".mp3").replace(base_dir_name, f"{base_dir_name}/{sound_dir_name}")
+        cmd = "ffmpeg -i {}  {}".format(file_name, output_file_name)
+        print(file_name)
+        print(output_file_name)
+        print("=========================")
+        subprocess.call(cmd, shell=True)
+
+def resize_img(dir_full_path : str, img_file_ext : str = "jpg"):
+    # TODO:動くかどうかを確認
+    # file_list = get_file_list(dir_full_path, movie_file_ext)
+    file_list = get_file_list(dir_full_path, img_file_ext)
+    convert_dir = dir_full_path + "convert/"
+
+    for file_name in file_list:
+        img = Image.open(file_name)
+        img_resize = img.resize((int(img.width / 4), int(img.height / 4)))
+        title, ext = os.path.splitext(file_name)
+        img_resize.save(convert_dir + os.path.basename(file_name))
+
+def get_statistics(youtube, id):
+    # TODO:動くかどうかを動作確認
+    statistics = youtube.videos().list(part="statistics", id=id).execute()["items"][0]["statistics"]
+    return statistics
+
+# def get_youtube_statistics():
+#     # TODO:動くかどうかを動作確認
+#     youtube = build("youtube", "v3", developerKey=settings.APIKEY)
+
+#     search_response = youtube.search().list(
+#         part="snippet",
+#         maxResults="50",
+#         q="python",
+#         relevanceLanguage="ja",
+#         type="video"
+#     ).execute()
+#     df = pd.DataFrame()
+#     for item in search_response["items"]:
+#         statistics = get_statistics(item["id"]["videoId"])
+#         se = pd.Series([int(statistics["viewCOunt"]), item["snippet"]["title"]], ["再生回数", "タイトル"])
+#         df = df.append(se, ignore_index=True)
+
+#     df_s = df.sort_values("再生回数", "タイトル")
+#     print(df_s)
+
+# def does_dir_exist(target_dir : str, target_dir_searched : str):
+#     if type(target_dir) != str:
+#         raise TypeError("TypeError: target_dir must be str type.")
+#     if type(target_dir_searched) != str:
+#         raise TypeError("TypeError: target_dir_searched must be str type.")
+
+
+def convert_image_format(file_name : str, output_dir : str = "outputs", src_ext : str = "png", dest_ext : str = "jpg"):
+    if type(file_name) != str:
+        raise TypeError("file_name must be str type.")
+    if type(output_dir) != str:
+        raise TypeError("output_dir must be str type.")
+    if type(src_ext) != str:
+        raise TypeError("src_ext must be str type.")
+    if type(dest_ext) != str:
+        raise TypeError("dest_ext must be str type.")
+    if f".{src_ext}" not in file_name:
+        raise ValueError("ValueError: src_ext must be contained by file_name.")
+    file_name_without_ext = file_name.replace(f".{src_ext}", "")
+    im = Image.open(f"{file_name_without_ext}.{src_ext}")
+    im = im.convert("RGB")
+    src_path = f"{file_name_without_ext}.{dest_ext}"
+    im.save(src_path)
+    # dest_path = f"{str(pathlib.Path(src_path).parent)}/{output_dir}"
+    dest_path = output_dir
+    print(str(pathlib.Path(src_path).parent))
+    shutil.move(src_path, dest_path)
+    return True
+
+def convert_image_format_in_folder(src_dir : str, output_dir : str = "outputs", src_ext : str = "png", dest_ext : str = "jpg"):
+    if type(src_dir) != str:
+        raise TypeError("src_dir must be str type.")
+    if type(output_dir) != str:
+        raise TypeError("output_dir must be str type.")
+    new_output_dir = f"{src_dir}/{output_dir}"
+    new_output_path = pathlib.Path(new_output_dir)
+    if new_output_path.exists():
+        raise FileExistsError(f"\"{new_output_dir}\" exists.")
+    if type(src_ext) != str:
+        raise TypeError("src_ext must be str type.")
+    if type(dest_ext) != str:
+        raise TypeError("dest_ext must be str type.")
+    # files = get_file_list(folder_dir, src_ext)
+    files = get_file_list(src_dir, src_ext)
+    new_output_path.mkdir()
+    try:
+        for file_name in files:
+            convert_image_format(file_name, new_output_dir, src_ext, dest_ext)
+    except Exception as e_img:
+        try:
+            new_output_path.rmdir()
+        except OSError as e_rmdir:
+            print(f"File was not removed because file existed in \"{output_dir}\"")
+        raise e_img
+    return True
+
+def exe_convert_image_format_in_folder():
+    args = sys.argv
+    convert_image_format_in_folder(str(args[1]))
+    # convert_image_format_in_folder(str(args[1]), str(args[2]), str(args[3]))
+    return True
+
 def main():
+    args = sys.argv
+
     # # test code for select_area()
     # list_of_ext = ["jpg"]
-    # select_area(dir_editor.decide_now_file(list_of_ext))
+    # select_area(decide_now_file(list_of_ext))
 
     # test code for trim_image()
     # trim_image('jpg')
 
     # test code for remove_duplication()
-    file_list = file_list_getter.get_file_list(dir_editor.decide_now_dir(),'jpg')
-    remove_duplication(file_list)
+    # file_list = get_file_list(decide_now_dir(),'jpg')
+    # remove_duplication(file_list)
 
     # test code for extract_image()
     # list_of_ext = ["mp4"]
-    # extract_image(dir_editor.decide_now_file(list_of_ext))
+    # extract_image(decide_now_file(list_of_ext))
+
+    # test code for convert_image_format_in_folder()
+    convert_image_format_in_folder(str(args[1]))
+    # convert_image_format_in_folder(str(args[1]), 'png', 'jpg')
 
 if __name__ == "__main__":
     main()

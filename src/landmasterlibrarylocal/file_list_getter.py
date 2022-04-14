@@ -5,10 +5,11 @@ import glob2
 import os, sys, platform
 import time
 # IMPORT module FROM LandmasterLibrary
-import input_controller
-import dir_editor
-sep = dir_editor.decide_seperator() # String seperator of directory.
-import text_editor
+from input_controller import repeat_input_with_multi_choices
+from dir_editor import decide_seperator, make_directory, input_ext_list, decide_save_file_name, generate_file_name
+sep = decide_seperator() # String seperator of directory.
+# import src.landmasterlibrary.text_editor as text_editor
+from text_editor import write_playlist, write_csv
 
 def extract_playlist_from_text(file_list : list):
     '''
@@ -25,10 +26,10 @@ def extract_playlist_from_text(file_list : list):
         print('\nfile_list_getter.extract_playlist exits because of no target files.')
         sys.exit(0)
 
-    extracted_dir = dir_editor.make_directory(file_name)
+    extracted_dir = make_directory(file_name)
 
     input_message = 'Select type of playlist.\n[ 0: Windows, 1: Walkman, 2: Android ]'
-    playlist_type = input_controller.repeat_input_with_multi_choices(input_message, ['0', '1', '2'])
+    playlist_type = repeat_input_with_multi_choices(input_message, ['0', '1', '2'])
     type_list     = {'0': 'Windows', '1': 'Walkman', '2': 'Android'}
     print('You selected for "{}"'.format(type_list[playlist_type]))
 
@@ -38,7 +39,7 @@ def extract_playlist_from_text(file_list : list):
     #     fileName = input('それでは、基となるテキストファイル名を入力して下さい。')
 
     for file_name in file_list:
-        text_editor.write_playlist(file_name, extracted_dir, playlist_type)
+        write_playlist(file_name, extracted_dir, playlist_type)
 
     print('FileListGetter.extract_playlist is terminated.')
     print('Check directory "{dirname}"'.format(dirname=extracted_dir))
@@ -53,10 +54,10 @@ def extract_file_name_book(dir_full_path : str):
     data_list        : List to memorize to dataListEXP. [, , ...]
     time_mod         : String data of date and time.
     '''
-    # now_dir          = dir_editor.decide_now_dir()
+    # now_dir          = decide_now_dir()
     now_dir          = dir_full_path
-    file_list        = get_file_list(now_dir, dir_editor.input_ext_list(ext_range=1)[0])
-    export_file_name = dir_editor.decide_save_file_name(now_dir, ["csv"])
+    file_list        = get_file_list(now_dir, input_ext_list(ext_range=1)[0])
+    export_file_name = decide_save_file_name(now_dir, ["csv"])
 
     data_list_exp = []
     date_format = '%Y/%m/%d %H:%M:%S' # 日付の出力用
@@ -68,7 +69,7 @@ def extract_file_name_book(dir_full_path : str):
         data_list.append(time_mod)
         data_list_exp.append(data_list)
     for data in data_list_exp:
-        text_editor.write_csv(export_file_name, data)
+        write_csv(export_file_name, data)
 
     print('extract_file_name_book is terminated.')
     print('Check directory "{dirname}"'.format(dirname=export_file_name))
@@ -91,7 +92,7 @@ def confirm_execution(target : str, replace : str) -> str:
         input_message = 'I will delete "{target}", OK? [ y / n ] : '.format(target=target)
     else:
         input_message = 'I will rename {target} → {replace}, OK? [ y / n ] : '.format(target=target,replace=replace)
-    execute_confirmation = input_controller.repeat_input_with_multi_choices(input_message, ['y', 'n'])
+    execute_confirmation = repeat_input_with_multi_choices(input_message, ['y', 'n'])
     return execute_confirmation
 
 def edit_file_name(dir_full_path : str):
@@ -113,11 +114,11 @@ def edit_file_name(dir_full_path : str):
     replace_file_name             : String absolutely replaced filename.
     '''
     ext = input('What Extension? (without ".") : ')
-    now_dir = dir_editor.decide_now_dir()
+    now_dir = decide_now_dir()
     # now_dir = dir_full_path
     file_list = get_file_list(now_dir, ext)
     input_message = 'Select mode. [ A: Add, D: Delete, R: Replace, E: Exit ]'
-    mode_selected = input_controller.repeat_input_with_multi_choices(input_message, ['A', 'D', 'R', 'E'])
+    mode_selected = repeat_input_with_multi_choices(input_message, ['A', 'D', 'R', 'E'])
     if mode_selected == 'E':
         print('Exit.')
         sys.exit(0)
@@ -131,7 +132,7 @@ def edit_file_name(dir_full_path : str):
     if mode_selected == 'A':
         # F : edit by using directory's seperator, B : edit by using extension's dot.
         input_message  = 'Which point do you wanna edit, Forward or Back? [ F / B ] : '
-        forward_or_back = input_controller.repeat_input_with_multi_choices(input_message, ['F', 'B'])
+        forward_or_back = repeat_input_with_multi_choices(input_message, ['F', 'B'])
     try:
         if mode_selected != 'A':
             target_character_alignment  = input(mode_dict_message_for_target[mode_selected])
@@ -153,7 +154,7 @@ def edit_file_name(dir_full_path : str):
             elif mode_selected == 'D' or mode_selected == 'R':
                 after_replace_name = os.path.splitext(os.path.basename(i))[0].replace(target_character_alignment, replace_character_alignment)
             target_file_name  = i
-            replace_file_name = dir_editor.generate_file_name(os.path.dirname(i), sep, '{filename}.{ext}'.format(filename=after_replace_name, ext=ext))
+            replace_file_name = generate_file_name(os.path.dirname(i), sep, '{filename}.{ext}'.format(filename=after_replace_name, ext=ext))
             os.rename(target_file_name, replace_file_name)
     else:
         sys.exit(0)
@@ -169,7 +170,7 @@ def get_file_list(folder_dir : str, ext : str) -> list:
         print("ERROR: No directory is selected.")
         sys.exit(0)
 
-    folder_list = glob2.glob(dir_editor.generate_file_name(folder_dir, sep, '*.{ext}'.format(ext=ext)))
+    folder_list = glob2.glob(generate_file_name(folder_dir, sep, '*.{ext}'.format(ext=ext)))
 
     # sort order of list is irregulary if you use "glob"
     list.sort(folder_list, reverse=False)
@@ -181,19 +182,19 @@ def get_file_list(folder_dir : str, ext : str) -> list:
 
 def main():
     # # test code for extract_playlist()
-    # extract_playlist(get_file_list(dir_editor.decide_now_dir(),'txt'))
+    # extract_playlist(get_file_list(decide_now_dir(),'txt'))
 
     # # test code for extract_file_name_book()
-    extract_file_name_book(dir_editor.decide_now_dir())
+    extract_file_name_book(decide_now_dir())
 
     # # test code for confirm_execution()
     # confirm_execution('a', 'b')
 
     # test code for edit_file_name()
-    # edit_file_name(dir_editor.decide_now_dir())
+    # edit_file_name(decide_now_dir())
 
     # # test code for get_file_list()
-    # get_file_list(dir_editor.decide_now_dir(), 'jpg')
+    # get_file_list(decide_now_dir(), 'jpg')
 
 if __name__ == "__main__":
     main()

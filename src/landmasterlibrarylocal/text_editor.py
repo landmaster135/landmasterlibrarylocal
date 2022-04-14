@@ -4,8 +4,10 @@
 import os, sys, platform
 # IMPORT module FROM LandmasterLibrary
 import input_controller
-import dir_editor
-sep = dir_editor.decide_seperator() # String seperator of directory.
+# import dir_editor
+from dir_editor import decide_seperator, generate_file_name, decide_now_dir
+sep = decide_seperator() # String seperator of directory.
+
 
 def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
     '''
@@ -41,7 +43,7 @@ def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
     if playlist_type == '1':
         data_line = '#EXTM3U\n' + data_line
 
-    export_name = dir_editor.generate_file_name(extracted_dir, sep, os.path.basename(file_name).replace('.txt', ext_dict[playlist_type]))
+    export_name = generate_file_name(extracted_dir, sep, os.path.basename(file_name).replace('.txt', ext_dict[playlist_type]))
     with open(export_name, mode="w", encoding="utf-8") as f:
         f.write(data_line)
 
@@ -72,7 +74,7 @@ def write_text(file_name, now_list):
 
 def main():
     # test code for WriteText()
-    write_text(dir_editor.decide_now_dir(), ['apple', 'banana', 'orange'])
+    write_text(decide_now_dir(), ['apple', 'banana', 'orange'])
 
 if __name__ == "__main__":
     main()

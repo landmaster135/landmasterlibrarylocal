@@ -3,9 +3,9 @@
 
 import os, sys
 # IMPORT module FROM LandmasterLibrary
-import dir_editor
-sep = dir_editor.decide_seperator() # String seperator of directory.
-import file_list_getter
+from dir_editor import decide_seperator, decide_now_dir, generate_file_name, make_directory
+sep = decide_seperator() # String seperator of directory.
+from file_list_getter import get_file_list
 
 def make_vertical(folder_list : list):
     '''
@@ -25,7 +25,7 @@ def make_vertical(folder_list : list):
         print('\nPDFRotater exits because of no target files.')
         sys.exit(0)
 
-    rotated_dir = dir_editor.make_directory(filename)
+    rotated_dir = make_directory(filename)
 
     for filename in folder_list:
         print("Rotate all page of PDF:", filename)
@@ -48,7 +48,7 @@ def make_vertical(folder_list : list):
 
         # new file entry
         # output_filename = '{dirname}{sep}{basename}'.format(dirname=rotated_dir, sep=sep, basename=os.path.basename(filename))
-        output_filename = dir_editor.generate_file_name(rotated_dir, sep, os.path.basename(filename))
+        output_filename = generate_file_name(rotated_dir, sep, os.path.basename(filename))
         with open(output_filename, "wb") as outputStream:
             rotated.write(outputStream)
 
@@ -57,7 +57,7 @@ def make_vertical(folder_list : list):
     print('\n\nCheck new folder. "{}"'.format(rotated_dir))
 
 def main():
-    make_vertical(file_list_getter.get_file_list(dir_editor.decide_now_dir(),'pdf'))
+    make_vertical(get_file_list(decide_now_dir(),'pdf'))
 
 if __name__ == "__main__":
     main()

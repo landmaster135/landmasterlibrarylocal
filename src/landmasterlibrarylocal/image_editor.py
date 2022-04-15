@@ -31,7 +31,7 @@ from PIL import Image
 # from .file_list_getter import get_file_list
 # from .text_editor import write_text
 
-from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
+from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices, move_files
 from dir_editor import decide_seperator, make_directory, generate_file_name, decide_now_dir
 sep = decide_seperator() # String seperator of directory.
 from file_list_getter import get_file_list
@@ -419,11 +419,11 @@ def get_statistics(youtube, id):
 #         raise TypeError("TypeError: target_dir_searched must be str type.")
 
 
-def convert_image_format(file_name : str, output_dir : str = "outputs", src_ext : str = "png", dest_ext : str = "jpg"):
+def convert_image_format(file_name : str, src_ext : str = "png", dest_ext : str = "jpg") -> str:
     if type(file_name) != str:
         raise TypeError("file_name must be str type.")
-    if type(output_dir) != str:
-        raise TypeError("output_dir must be str type.")
+    # if type(output_dir) != str:
+    #     raise TypeError("output_dir must be str type.")
     if type(src_ext) != str:
         raise TypeError("src_ext must be str type.")
     if type(dest_ext) != str:
@@ -436,35 +436,33 @@ def convert_image_format(file_name : str, output_dir : str = "outputs", src_ext 
     src_path = f"{file_name_without_ext}.{dest_ext}"
     im.save(src_path)
     # dest_path = f"{str(pathlib.Path(src_path).parent)}/{output_dir}"
-    dest_path = output_dir
+    # dest_path = output_dir
     print(str(pathlib.Path(src_path).parent))
-    shutil.move(src_path, dest_path)
-    return True
+    # shutil.move(src_path, dest_path)
+    return src_path
 
-def convert_image_format_in_folder(src_dir : str, output_dir : str = "outputs", src_ext : str = "png", dest_ext : str = "jpg"):
+def convert_image_format_in_folder(src_dir : str, output_dir : str = "outputs", src_ext : str = "png", dest_ext : str = "jpg") -> bool:
     if type(src_dir) != str:
         raise TypeError("src_dir must be str type.")
     if type(output_dir) != str:
         raise TypeError("output_dir must be str type.")
-    new_output_dir = f"{src_dir}/{output_dir}"
-    new_output_path = pathlib.Path(new_output_dir)
-    if new_output_path.exists():
-        raise FileExistsError(f"\"{new_output_dir}\" exists.")
     if type(src_ext) != str:
         raise TypeError("src_ext must be str type.")
     if type(dest_ext) != str:
         raise TypeError("dest_ext must be str type.")
     # files = get_file_list(folder_dir, src_ext)
     files = get_file_list(src_dir, src_ext)
-    new_output_path.mkdir()
+
+    converted_image_files = []
     try:
         for file_name in files:
-            convert_image_format(file_name, new_output_dir, src_ext, dest_ext)
+            converted_image_file = convert_image_format(file_name, src_ext, dest_ext)
+            converted_image_files.append(converted_image_file)
+        move_files(converted_image_files, output_dir)
     except Exception as e_img:
-        try:
-            new_output_path.rmdir()
-        except OSError as e_rmdir:
-            print(f"File was not removed because file existed in \"{output_dir}\"")
+        for image_file in converted_image_files:
+            if image_file not in files:
+                pathlib.Path(image_file).unlink()
         raise e_img
     return True
 

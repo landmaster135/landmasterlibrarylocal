@@ -5,8 +5,8 @@ import glob2
 import os, sys, platform
 import time
 # IMPORT module FROM LandmasterLibrary
-from input_controller import repeat_input_with_multi_choices
-from dir_editor import decide_seperator, make_directory, input_ext_list, decide_save_file_name, generate_file_name
+from input_controller import repeat_input_with_multi_choices, move_file
+from dir_editor import decide_seperator, make_directory, input_ext_list, generate_file_name
 sep = decide_seperator() # String seperator of directory.
 # import src.landmasterlibrary.text_editor as text_editor
 from text_editor import write_playlist, write_csv
@@ -44,7 +44,7 @@ def extract_playlist_from_text(file_list : list):
     print('FileListGetter.extract_playlist is terminated.')
     print('Check directory "{dirname}"'.format(dirname=extracted_dir))
 
-def extract_file_name_book(dir_full_path : str):
+def extract_file_name_book(dir_full_path : str, export_file_name : str = "extracted.csv"):
     '''
     now_dir          : String name of now direcotry.
     file_list        : List of String filename.
@@ -57,7 +57,13 @@ def extract_file_name_book(dir_full_path : str):
     # now_dir          = decide_now_dir()
     now_dir          = dir_full_path
     file_list        = get_file_list(now_dir, input_ext_list(ext_range=1)[0])
-    export_file_name = decide_save_file_name(now_dir, ["csv"])
+    if type(dir_full_path) != str:
+        raise TypeError("dir_full_path must be str type.")
+    if type(export_file_name) != str:
+        raise TypeError("export_file_name must be str type.")
+    if export_file_name[-4:] != ".csv":
+        raise ValueError("export_file_name is csv format.")
+    # export_file_name = decide_save_file_name(now_dir, ["csv"])
 
     data_list_exp = []
     date_format = '%Y/%m/%d %H:%M:%S' # 日付の出力用
@@ -70,6 +76,7 @@ def extract_file_name_book(dir_full_path : str):
         data_list_exp.append(data_list)
     for data in data_list_exp:
         write_csv(export_file_name, data)
+    move_file(export_file_name, dir_full_path)
 
     print('extract_file_name_book is terminated.')
     print('Check directory "{dirname}"'.format(dirname=export_file_name))
@@ -181,11 +188,13 @@ def get_file_list(folder_dir : str, ext : str) -> list:
     return folder_list
 
 def main():
+    args = sys.argv
     # # test code for extract_playlist()
     # extract_playlist(get_file_list(decide_now_dir(),'txt'))
 
     # # test code for extract_file_name_book()
-    extract_file_name_book(decide_now_dir())
+    # extract_file_name_book(decide_now_dir())
+    extract_file_name_book(args[1], "extracted.csv")
 
     # # test code for confirm_execution()
     # confirm_execution('a', 'b')

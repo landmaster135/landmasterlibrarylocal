@@ -3,6 +3,7 @@
 
 import os, sys
 import re # regular expression
+import shutil, pathlib
 
 def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext : str) -> bool:
     '''
@@ -76,6 +77,25 @@ def repeat_input_with_multi_choices(first_message : str, choice_list : list = []
                             break
         is_first_input = False
     return input_chr
+
+def move_files(src_paths : list, output_dir : str) -> bool:
+    src_dir = str(pathlib.Path(src_paths[0]).parent)
+    new_output_dir = f"{src_dir}/{output_dir}"
+    new_output_path = pathlib.Path(new_output_dir)
+    if new_output_path.exists():
+        raise FileExistsError(f"\"{str(new_output_path)}\" exists.")
+    new_output_path.mkdir()
+    for target_file in src_paths:
+        move_file(target_file, str(new_output_path))
+    return True
+
+def move_file(src_path : str, dest_path : str) -> bool:
+    if type(src_path) != str:
+        raise TypeError("src_path must be str type.")
+    if type(dest_path) != str:
+        raise TypeError("dest_path must be str type.")
+    shutil.move(src_path, dest_path)
+    return True
 
 def main():
     # test code for RepeatInputWithMultiChoices()

@@ -6,19 +6,20 @@ from tkinter import filedialog
 # IMPORT module FROM LandmasterLibrary
 import input_controller
 
-def decide_save_file_name(dirname : str, list_of_ext : list) -> str:
-    '''
-    list_of_ext    : List String extension
-    dirname        : String absolutely directory of default folder
-    save_file_path : String absolutely path of selected file
-    '''
-    if list_of_ext == []:
-        list_of_ext = input_ext_list()
-    else:
-        pass
-    save_file_path = filedialog.asksaveasfilename(filetypes=decide_ext(list_of_ext), initialdir=dirname ,title = "Save As")
-    print("File's Absolutely Path: {quotation}{filepath}{quotation}".format(quotation='"',filepath=save_file_path))
-    return save_file_path
+# def decide_save_file_name(dirname : str, list_of_ext : list) -> str:
+#     '''
+#     list_of_ext    : List String extension
+#     dirname        : String absolutely directory of default folder
+#     save_file_path : String absolutely path of selected file
+#     '''
+#     if list_of_ext == []:
+#         list_of_ext = input_ext_list()
+#     else:
+#         pass
+
+#     save_file_path = filedialog.asksaveasfilename(filetypes=decide_ext(list_of_ext), initialdir=dirname ,title = "Save As")
+#     print(f"File's Absolutely Path: \"{save_file_path}\"")
+#     return save_file_path
 
 def generate_file_name(dirname : str, sep : str, filename_with_ext : str) -> str:
     '''

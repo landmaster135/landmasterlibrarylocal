@@ -48,7 +48,7 @@ def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
         f.write(data_line)
 
 
-def write_csv(target_file, target_list):
+def write_csv(target_file : str, target_list : list):
     '''
     target_file : String absolutely filename of target file.
     target_list : List of contents to write.
@@ -63,7 +63,7 @@ def write_csv(target_file, target_list):
                 f.write("%s" % target_list[m])
         f.write("\n")
 
-def write_text(file_name, now_list):
+def write_text(file_name : str, now_list : list):
     '''
     file_name : String absolutely path of selected file
     now_list  : List of statement to write

@@ -1,12 +1,14 @@
 # file_list_getter.py
 # code in shift-jis
 
-import glob2
+# Library by default
 import os, sys, platform
 import time
-# IMPORT module FROM LandmasterLibrary
-from input_controller import repeat_input_with_multi_choices, move_file
-from dir_editor import decide_seperator, make_directory, input_ext_list, generate_file_name
+# Library by third party
+import glob2
+# Library by landmasterlibrary
+from input_controller import repeat_input_with_multi_choices
+from dir_editor import decide_seperator, make_directory, input_ext_list, generate_file_name, move_file
 sep = decide_seperator() # String seperator of directory.
 # import src.landmasterlibrary.text_editor as text_editor
 from text_editor import write_playlist, write_csv
@@ -20,9 +22,12 @@ def extract_playlist_from_text(file_list : list):
     playlist_type : String type of playlist.
     type_list     : List of String.
     '''
+    if type(file_list) != list:
+        raise TypeError("file_list must be list type.")
     if len(file_list) != 0:
         file_name = file_list[0]
     else:
+        raise ValueError("file_list_getter.extract_playlist exits because of no target files.")
         print('\nfile_list_getter.extract_playlist exits because of no target files.')
         sys.exit(0)
 
@@ -54,7 +59,6 @@ def extract_file_name_book(dir_full_path : str, export_file_name : str = "extrac
     data_list        : List to memorize to dataListEXP. [, , ...]
     time_mod         : String data of date and time.
     '''
-    # now_dir          = decide_now_dir()
     now_dir          = dir_full_path
     file_list        = get_file_list(now_dir, input_ext_list(ext_range=1)[0])
     if type(dir_full_path) != str:
@@ -88,6 +92,10 @@ def confirm_execution(target : str, replace : str) -> str:
     input_message        : String message for first input.
     execute_confirmation : String Yes or No. [ 'y' / 'n' ]
     '''
+    if type(target) != str:
+        raise TypeError("target must be str type.")
+    if type(replace) != str:
+        raise TypeError("replace must be str type.")
     input_message        = ''
     execute_confirmation = ''
     if target == '' and replace == '':
@@ -120,10 +128,10 @@ def edit_file_name(dir_full_path : str):
     target_file_name              : String absolutely target filename.
     replace_file_name             : String absolutely replaced filename.
     '''
+    if type(dir_full_path) != str:
+        raise TypeError("dir_full_path must be str type.")
     ext = input('What Extension? (without ".") : ')
-    now_dir = decide_now_dir()
-    # now_dir = dir_full_path
-    file_list = get_file_list(now_dir, ext)
+    file_list = get_file_list(dir_full_path, ext)
     input_message = 'Select mode. [ A: Add, D: Delete, R: Replace, E: Exit ]'
     mode_selected = repeat_input_with_multi_choices(input_message, ['A', 'D', 'R', 'E'])
     if mode_selected == 'E':
@@ -172,7 +180,10 @@ def get_file_list(folder_dir : str, ext : str) -> list:
     ext         : String extension
     folder_list : List about selected folder
     '''
-
+    if type(folder_dir) != str:
+        raise TypeError("folder_dir must be str type.")
+    if type(ext) != str:
+        raise TypeError("ext must be str type.")
     if folder_dir == '':
         print("ERROR: No directory is selected.")
         sys.exit(0)
@@ -189,21 +200,20 @@ def get_file_list(folder_dir : str, ext : str) -> list:
 
 def main():
     args = sys.argv
-    # # test code for extract_playlist()
-    # extract_playlist(get_file_list(decide_now_dir(),'txt'))
+    # test code for extract_playlist_from_text()
+    # extract_playlist_from_text(get_file_list(args[1],'txt'))
 
-    # # test code for extract_file_name_book()
-    # extract_file_name_book(decide_now_dir())
-    extract_file_name_book(args[1], "extracted.csv")
+    # test code for extract_file_name_book()
+    # extract_file_name_book(args[1], "extracted.csv")
 
-    # # test code for confirm_execution()
+    # test code for confirm_execution()
     # confirm_execution('a', 'b')
 
     # test code for edit_file_name()
-    # edit_file_name(decide_now_dir())
+    edit_file_name(args[1])
 
-    # # test code for get_file_list()
-    # get_file_list(decide_now_dir(), 'jpg')
+    # test code for get_file_list()
+    # get_file_list(args[1], 'jpg')
 
 if __name__ == "__main__":
     main()

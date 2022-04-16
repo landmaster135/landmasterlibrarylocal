@@ -1,9 +1,9 @@
 # input_controller.py
 # code in shift-jis
 
+# Library by default
 import os, sys
 import re # regular expression
-import shutil, pathlib
 
 def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext : str) -> bool:
     '''
@@ -14,15 +14,17 @@ def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext :
     basefilename_without_ext : String name of calling file without extension.
     '''
     check_str = re.compile('[\\a-zA-Z0-9\-\_\.\-\s\:\~\^\=]+')
-    is_sjis_contained = False
+    does_sjis_contained_string_exist = False
     for i in target_str_list:
+        is_sjis_contained = False
         if check_str.fullmatch(i) == None:
+            does_sjis_contained_string_exist = True
             is_sjis_contained = True
         print('\nCheckWhetherSjisExists : targetStr is "{}" ・・・・・・ isSjisContained == {}'.format(i, is_sjis_contained))
 
     basefilename_without_ext = os.path.splitext(os.path.basename(callingfilename_with_ext))[0]
-    if is_sjis_contained == True:
-        print('\n\n{} exits because of the directory containing shift-jis character.'.format(basefilename_without_ext))
+    if does_sjis_contained_string_exist == True:
+        print(f'\n\n{basefilename_without_ext} exits because of the directory containing shift-jis character.')
         return True
     return False
 
@@ -77,25 +79,6 @@ def repeat_input_with_multi_choices(first_message : str, choice_list : list = []
                             break
         is_first_input = False
     return input_chr
-
-def move_files(src_paths : list, output_dir : str) -> bool:
-    src_dir = str(pathlib.Path(src_paths[0]).parent)
-    new_output_dir = f"{src_dir}/{output_dir}"
-    new_output_path = pathlib.Path(new_output_dir)
-    if new_output_path.exists():
-        raise FileExistsError(f"\"{str(new_output_path)}\" exists.")
-    new_output_path.mkdir()
-    for target_file in src_paths:
-        move_file(target_file, str(new_output_path))
-    return True
-
-def move_file(src_path : str, dest_path : str) -> bool:
-    if type(src_path) != str:
-        raise TypeError("src_path must be str type.")
-    if type(dest_path) != str:
-        raise TypeError("dest_path must be str type.")
-    shutil.move(src_path, dest_path)
-    return True
 
 def main():
     # test code for RepeatInputWithMultiChoices()

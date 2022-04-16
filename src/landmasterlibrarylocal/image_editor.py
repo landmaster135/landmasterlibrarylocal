@@ -31,8 +31,8 @@ from PIL import Image
 # from .file_list_getter import get_file_list
 # from .text_editor import write_text
 
-from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices, move_files
-from dir_editor import decide_seperator, make_directory, generate_file_name, decide_now_dir
+from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
+from dir_editor import decide_seperator, make_directory, generate_file_name, move_files
 sep = decide_seperator() # String seperator of directory.
 from file_list_getter import get_file_list
 from text_editor import write_text
@@ -49,6 +49,10 @@ def select_area(filename : str) -> dict:
     import matplotlib.pyplot as plt
     from matplotlib.widgets import Slider
 
+    if type(filename) != str:
+        raise TypeError("filename must be str type.")
+    if filename[-4:] not in [".jpg", ".png", ".JPG", ".PNG"] and filename[-5:] not in [".jpeg"]:
+        raise TypeError("filename must contain image extension.")
     img = Image.open(filename) # this function has no exception handling
     width, height = img.size
 
@@ -74,10 +78,10 @@ def select_area(filename : str) -> dict:
     axLeft   = plt.axes([0.25, 0.10, 0.65, 0.03], facecolor=axcolor)
     axRight  = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor=axcolor)
 
-    sliderTop    = Slider(axTop, 'Top', 0, height/2 - 1, valinit=0, valstep=delta_f)
-    sliderBottom = Slider(axBottom, 'Bottom', 0, height/2 - 1, valinit=0, valstep=delta_f)
-    sliderLeft   = Slider(axLeft, 'Left', 0, width/2 - 1, valinit=0, valstep=delta_f)
-    sliderRight  = Slider(axRight, 'Right', 0, width/2 - 1, valinit=0, valstep=delta_f)
+    sliderTop    = Slider(axTop, 'Top', 0, height - 1, valinit=0, valstep=delta_f)
+    sliderBottom = Slider(axBottom, 'Bottom', 0, height - 1, valinit=0, valstep=delta_f)
+    sliderLeft   = Slider(axLeft, 'Left', 0, width - 1, valinit=0, valstep=delta_f)
+    sliderRight  = Slider(axRight, 'Right', 0, width - 1, valinit=0, valstep=delta_f)
 
     # image size before trimming
     top    = sliderTop.val
@@ -111,16 +115,21 @@ def select_area(filename : str) -> dict:
     plt.show()
 
     # image size after trimming
-    top    = sliderTop.val
-    bottom = height - sliderBottom.val
-    left   = sliderLeft.val
-    right  = width - sliderRight.val
+    top    = int(sliderTop.val)
+    bottom = int(height - sliderBottom.val)
+    left   = int(sliderLeft.val)
+    right  = int(width - sliderRight.val)
 
-    frame_dict = {'top': int(top), 'bottom': int(bottom), 'left': int(left), 'right': int(right)}
+    if top >= bottom:
+        raise ValueError("top must be less than bottom.")
+    if left >= right:
+        raise ValueError("left must be less than right.")
+
+    frame_dict = {'top': top, 'bottom': bottom, 'left': left, 'right': right}
     print("FrameSize for trimming is ", frame_dict)
     return frame_dict
 
-def trim_image(trimmed_img_ext : str = "jpg"):
+def trim_image(target_dir : str, trimmed_img_ext : str = "jpg") -> bool:
     '''
     fileList                 : List of file filtered with extension in the selected folder.
     basefilename_without_ext : String name of base file without extension.
@@ -131,10 +140,15 @@ def trim_image(trimmed_img_ext : str = "jpg"):
     trimmed_img_ext          : String of extension of trimmed_img.
     trimmed_img_name         : String of filename of trimmed_img.
     '''
-    file_list = get_file_list(decide_now_dir(),trimmed_img_ext)
+    if type(target_dir) != str:
+        raise TypeError("target_dir must be str type.")
+    if type(trimmed_img_ext) != str:
+        raise TypeError("trimmed_img_ext must be list type.")
+    file_list = get_file_list(target_dir, trimmed_img_ext)
 
     # Error Handling
     if len(file_list) == 0:
+        raise ValueError("ImageEditor exits because of no target files.")
         print('\nImageEditor exits because of no target files.')
         sys.exit(0)
 
@@ -162,6 +176,8 @@ def trim_image(trimmed_img_ext : str = "jpg"):
         cv2.imwrite("{dirname}{sep}{trimmed_img_name}".format(dirname=extracted_dir,sep=sep,trimmed_img_name=trimmed_img_name), trimmed_img)
         print("saved: {trimmed_img_name}".format(trimmed_img_name=trimmed_img_name))
     print('Check directory "{dirname}"'.format(dirname=extracted_dir))
+
+    return True
 
 def judge_match_rate_by_feature_point(file_name_1 : str, file_name_2 : str) -> float:
     '''
@@ -261,6 +277,7 @@ def remove_duplication(folder_list : list):
     assess_mode = 'N'
     border_line = 70
     list_for_text = []
+    message_how_many_matches = "How many matches are required not to remove?(0 to 100) : "
     # compare both image to remove img1 or not
     for i in range(0, len(folder_list) - 1):
         img_name_1 = os.path.splitext(os.path.basename(folder_list[i]))[0]
@@ -270,9 +287,9 @@ def remove_duplication(folder_list : list):
             assess_mode = repeat_input_with_multi_choices('\nWhich method to assess?\n[ F: FeaturePoint, P: PixelMatch ] : ', ['F', 'P'])
             if execute_mode == 'R':
                 if assess_mode == 'F':
-                    border_line = repeat_input_with_multi_choices('How many matches are required not to remove? : ', [0, 100])
+                    border_line = repeat_input_with_multi_choices(message_how_many_matches, [0, 100])
                 elif assess_mode == 'P':
-                    border_line = repeat_input_with_multi_choices('How many matches are required to remove? : ', [0, 100])
+                    border_line = repeat_input_with_multi_choices(message_how_many_matches, [0, 100])
             elif execute_mode == 'S':
                 pass
         # do assessment
@@ -307,15 +324,18 @@ def extract_image(video_name : str):
     num_of_image  : Integer number of extracted images from video
     '''
     # Error Handling
+    if type(video_name) != str:
+        raise TypeError("dir_full_path must be str type.")
     if video_name == '':
-        print("ERROR: No file is selected.")
-        sys.exit(0)
+        raise ValueError("No file is selected.")
+    if video_name[-4:] not in [".mov", ".mp4"]:
+        raise TypeError("video_name must contain video extension.")
 
     extracted_dir = make_directory(video_name)
 
     # Error Handling
     if check_whether_sjis_exists([video_name, extracted_dir], __file__) == True:
-        sys.exit(0)
+        raise ValueError("video_name contained s-jis.")
 
     cap = cv2.VideoCapture(video_name)
     # width
@@ -477,21 +497,23 @@ def main():
 
     # # test code for select_area()
     # list_of_ext = ["jpg"]
-    # select_area(decide_now_file(list_of_ext))
+    # select_area(str(args[1]))
 
     # test code for trim_image()
     # trim_image('jpg')
+    # trim_image(str(args[1]), 'jpg')
 
     # test code for remove_duplication()
     # file_list = get_file_list(decide_now_dir(),'jpg')
-    # remove_duplication(file_list)
+    file_list = get_file_list(str(args[1]),'jpg')
+    remove_duplication(file_list)
 
     # test code for extract_image()
     # list_of_ext = ["mp4"]
-    # extract_image(decide_now_file(list_of_ext))
+    # extract_image(str(args[1]))
 
     # test code for convert_image_format_in_folder()
-    convert_image_format_in_folder(str(args[1]))
+    # convert_image_format_in_folder(str(args[1]))
     # convert_image_format_in_folder(str(args[1]), 'png', 'jpg')
 
 if __name__ == "__main__":

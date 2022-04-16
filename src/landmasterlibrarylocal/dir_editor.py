@@ -1,9 +1,12 @@
 # dir_editor.py
 # code in shift-jis
 
+# Library by default
 import os, sys, platform
+import shutil, pathlib
+# Library by third party
 from tkinter import filedialog
-# IMPORT module FROM LandmasterLibrary
+# Library by landmasterlibrary
 import input_controller
 
 # def decide_save_file_name(dirname : str, list_of_ext : list) -> str:
@@ -107,35 +110,35 @@ def decide_ext(list_of_ext : list) -> list:
             ext_by_tuple = ""
     return file_types
 
-def decide_now_file(list_of_ext : list) -> str:
-    '''
-    list_of_ext   : List String extension
-    now_dir       : String absolutely directory of default folder
-    now_file_path : String absolutely path of selected file
-    '''
-    if list_of_ext == []:
-        list_of_ext = input_ext_list()
-    else:
-        pass
-    now_dir = os.path.abspath(os.path.dirname(__file__))
-    now_file_path = filedialog.askopenfilename(filetypes=decide_ext(list_of_ext), initialdir=now_dir)
-    print("File's Absolutely Path: {quotation}{filepath}{quotation}".format(quotation='"',filepath=now_file_path))
-    return now_file_path
+# def decide_now_file(list_of_ext : list) -> str:
+#     '''
+#     list_of_ext   : List String extension
+#     now_dir       : String absolutely directory of default folder
+#     now_file_path : String absolutely path of selected file
+#     '''
+#     if list_of_ext == []:
+#         list_of_ext = input_ext_list()
+#     else:
+#         pass
+#     now_dir = os.path.abspath(os.path.dirname(__file__))
+#     now_file_path = filedialog.askopenfilename(filetypes=decide_ext(list_of_ext), initialdir=now_dir)
+#     print("File's Absolutely Path: {quotation}{filepath}{quotation}".format(quotation='"',filepath=now_file_path))
+#     return now_file_path
 
-def decide_now_dir() -> str:
-    '''
-    now_dir      : String absolutely directory default folder
-    now_dir_path : String absolutely path selected folder
-    '''
-    now_dir = os.path.abspath(os.path.dirname(__file__))
-    now_dir_path = filedialog.askdirectory(initialdir=now_dir)
+# def decide_now_dir() -> str:
+#     '''
+#     now_dir      : String absolutely directory default folder
+#     now_dir_path : String absolutely path selected folder
+#     '''
+#     now_dir = os.path.abspath(os.path.dirname(__file__))
+#     now_dir_path = filedialog.askdirectory(initialdir=now_dir)
 
-    # Discrimination whether Windows or Mac.
-    pf = platform.system()
-    if pf == 'Windows': # OS is Windows
-        now_dir_path = now_dir_path.replace('/', '\\')
-    print("Folder's Absolutely Path: {quotation}{folderpath}{quotation}".format(quotation='"',folderpath=now_dir_path))
-    return now_dir_path
+#     # Discrimination whether Windows or Mac.
+#     pf = platform.system()
+#     if pf == 'Windows': # OS is Windows
+#         now_dir_path = now_dir_path.replace('/', '\\')
+#     print("Folder's Absolutely Path: {quotation}{folderpath}{quotation}".format(quotation='"',folderpath=now_dir_path))
+#     return now_dir_path
 
 def decide_seperator() -> str:
     '''
@@ -151,6 +154,25 @@ def decide_seperator() -> str:
     elif pf == 'Darwin': # OS is Mac
         sep = '/'
     return sep
+
+def move_files(src_paths : list, output_dir : str) -> bool:
+    src_dir = str(pathlib.Path(src_paths[0]).parent)
+    new_output_dir = f"{src_dir}/{output_dir}"
+    new_output_path = pathlib.Path(new_output_dir)
+    if new_output_path.exists():
+        raise FileExistsError(f"\"{str(new_output_path)}\" exists.")
+    new_output_path.mkdir()
+    for target_file in src_paths:
+        move_file(target_file, str(new_output_path))
+    return True
+
+def move_file(src_path : str, dest_path : str) -> bool:
+    if type(src_path) != str:
+        raise TypeError("src_path must be str type.")
+    if type(dest_path) != str:
+        raise TypeError("dest_path must be str type.")
+    shutil.move(src_path, dest_path)
+    return True
 
 def main():
     # test code for DecideSeperator()

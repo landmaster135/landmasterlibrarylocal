@@ -1,3 +1,4 @@
+# Library by default
 import sqlite3
 
 dbpath = 'wwwardrobe.sqlite' # DB's path

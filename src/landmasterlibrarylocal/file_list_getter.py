@@ -28,8 +28,6 @@ def extract_playlist_from_text(file_list : list):
         file_name = file_list[0]
     else:
         raise ValueError("file_list_getter.extract_playlist exits because of no target files.")
-        print('\nfile_list_getter.extract_playlist exits because of no target files.')
-        sys.exit(0)
 
     extracted_dir = make_directory(file_name)
 

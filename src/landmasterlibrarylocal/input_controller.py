@@ -13,6 +13,10 @@ def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext :
     isSjisContained          : Boolean.
     basefilename_without_ext : String name of calling file without extension.
     '''
+    if type(target_str_list) != list:
+        raise TypeError("target_str_list must be list type.")
+    if type(callingfilename_with_ext) != str:
+        raise TypeError("callingfilename_with_ext must be str type.")
     check_str = re.compile('[\\a-zA-Z0-9\-\_\.\-\s\:\~\^\=]+')
     does_sjis_contained_string_exist = False
     for i in target_str_list:
@@ -37,6 +41,10 @@ def repeat_input_with_multi_choices(first_message : str, choice_list : list = []
     input_message    : String message for input.
     input_chr        : String input character.
     '''
+    if type(first_message) != str:
+        raise TypeError("first_message must be str type.")
+    if type(choice_list) != list:
+        raise TypeError("choice_list must be list type.")
     is_input_correct = False
     is_first_input   = True
     input_message   = ''

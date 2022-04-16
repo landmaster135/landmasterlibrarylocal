@@ -1,6 +1,7 @@
 # text_editor.py
 # code in shift-jis
 
+# Library by default
 import os, sys, platform
 # IMPORT module FROM LandmasterLibrary
 import input_controller
@@ -23,7 +24,6 @@ def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
     sep_dict      : Dictionary of String seperator for playlist.
     export_name   : String absolutely filename to export.
     '''
-
     if type(file_name) != str:
         raise TypeError("file_name must be str type.")
     if type(extracted_dir) != str:

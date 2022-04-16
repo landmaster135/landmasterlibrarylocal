@@ -8,29 +8,9 @@ import subprocess
 import pathlib
 import shutil
 # Library by third party
-import cv2 # opencv 3.4.2
-import pandas as pd
+import cv2
 from PIL import Image
 # Library by landmasterlibrary
-# import input_controller
-# import dir_editor
-# sep = dir_editor.decide_seperator() # String seperator of directory.
-# import file_list_getter
-# import text_editor
-
-# import src.landmasterlibrary.input_controller as input_controller
-# import src.landmasterlibrary.dir_editor as dir_editor
-# from .input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
-# from .dir_editor import decide_seperator, make_directory, generate_file_name
-
-# sep = dir_editor.decide_seperator() # String seperator of directory.
-# sep = decide_seperator() # String seperator of directory.
-
-# import src.landmasterlibrary.file_list_getter as file_list_getter
-# import src.landmasterlibrary.text_editor as text_editor
-# from .file_list_getter import get_file_list
-# from .text_editor import write_text
-
 from input_controller import check_whether_sjis_exists, repeat_input_with_multi_choices
 from dir_editor import decide_seperator, make_directory, generate_file_name, move_files
 sep = decide_seperator() # String seperator of directory.
@@ -152,11 +132,7 @@ def trim_image(target_dir : str, trimmed_img_ext : str = "jpg") -> bool:
         print('\nImageEditor exits because of no target files.')
         sys.exit(0)
 
-    # selectTimes = input('What times do you choosing? ("1" or "every"): ')
-    # while selectTimes != '1' and selectTimes != 'every':
-    #     selectTimes = input('Retry. ("1" or "every"): ')
     select_times = repeat_input_with_multi_choices('\nWhat times do you choosing? ("1" or "every"): ', ['1', 'every'])
-
     extracted_dir = make_directory(file_list[0])
 
     # Error Handling
@@ -325,7 +301,7 @@ def extract_image(video_name : str):
     '''
     # Error Handling
     if type(video_name) != str:
-        raise TypeError("dir_full_path must be str type.")
+        raise TypeError("video_name must be str type.")
     if video_name == '':
         raise ValueError("No file is selected.")
     if video_name[-4:] not in [".mov", ".mp4"]:
@@ -338,13 +314,9 @@ def extract_image(video_name : str):
         raise ValueError("video_name contained s-jis.")
 
     cap = cv2.VideoCapture(video_name)
-    # width
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-    # height
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    # number of frame
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    # fps
     fps = cap.get(cv2.CAP_PROP_FPS)
     print("movie's width: ", width, ", height: ", height)
 
@@ -359,7 +331,10 @@ def extract_image(video_name : str):
     cap.release()
 
 def get_times_of_movie_in_folder(dir_full_path : str, movie_file_ext : str = "mov"):
-    # file_list = get_file_list(dir_full_path, movie_file_ext)
+    if type(dir_full_path) != str:
+        raise TypeError("dir_full_path must be str type.")
+    if type(movie_file_ext) != str:
+        raise TypeError("movie_file_ext must be str type.")
     file_list = get_file_list(dir_full_path, movie_file_ext)
     print(file_list)
     total_time = 0
@@ -380,7 +355,10 @@ def get_times_of_movie_in_folder(dir_full_path : str, movie_file_ext : str = "mo
     print("Total_time is {}".format(total_time_to_display))
 
 def extract_sound_to_text(dir_full_path : str, movie_file_ext : str = "mov"):
-    # file_list = get_file_list(dir_full_path, movie_file_ext)
+    if type(dir_full_path) != str:
+        raise TypeError("dir_full_path must be str type.")
+    if type(movie_file_ext) != str:
+        raise TypeError("movie_file_ext must be str type.")
     file_list = get_file_list(dir_full_path, movie_file_ext)
     dir_name_list = dir_full_path.split("/")
     base_dir_name = dir_name_list[len(dir_name_list) - 1]
@@ -396,6 +374,10 @@ def extract_sound_to_text(dir_full_path : str, movie_file_ext : str = "mov"):
         subprocess.call(cmd, shell=True)
 
 def resize_img(dir_full_path : str, img_file_ext : str = "jpg"):
+    if type(dir_full_path) != str:
+        raise TypeError("dir_full_path must be str type.")
+    if type(img_file_ext) != str:
+        raise TypeError("img_file_ext must be str type.")
     # TODO:動くかどうかを確認
     # file_list = get_file_list(dir_full_path, movie_file_ext)
     file_list = get_file_list(dir_full_path, img_file_ext)
@@ -407,7 +389,11 @@ def resize_img(dir_full_path : str, img_file_ext : str = "jpg"):
         title, ext = os.path.splitext(file_name)
         img_resize.save(convert_dir + os.path.basename(file_name))
 
-def get_statistics(youtube, id):
+def get_statistics(youtube, id : str):
+    # if type(youtube) != str:
+    #     raise TypeError("youtube must be str type.")
+    if type(id) != str:
+        raise TypeError("id must be str type.")
     # TODO:動くかどうかを動作確認
     statistics = youtube.videos().list(part="statistics", id=id).execute()["items"][0]["statistics"]
     return statistics

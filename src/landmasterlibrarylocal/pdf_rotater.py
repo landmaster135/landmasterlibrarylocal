@@ -1,13 +1,14 @@
 # pdf_rotater.py
 # code in shift-jis
 
+# Library by default
 import os, sys
-# IMPORT module FROM LandmasterLibrary
+# Library by landmasterlibrary
 from dir_editor import decide_seperator, decide_now_dir, generate_file_name, make_directory
 sep = decide_seperator() # String seperator of directory.
 from file_list_getter import get_file_list
 
-def make_vertical(folder_list : list):
+def make_vertical(file_list : list):
     '''
     folderList        : list of file filtered with extension in the selected folder.
     filename          : fullname of selected file.
@@ -19,15 +20,16 @@ def make_vertical(folder_list : list):
     '''
     # PyPDF2 version is 1.26.0
     from PyPDF2 import PdfFileWriter, PdfFileReader
-    if len(folder_list) != 0:
-        filename = folder_list[0]
+    if type(file_list) != list:
+        raise TypeError("file_list must be list type.")
+    if len(file_list) != 0:
+        filename = file_list[0]
     else:
-        print('\nPDFRotater exits because of no target files.')
-        sys.exit(0)
+        raise ValueError("PDFRotater exits because of no target files.")
 
     rotated_dir = make_directory(filename)
 
-    for filename in folder_list:
+    for filename in file_list:
         print("Rotate all page of PDF:", filename)
 
         original = PdfFileReader(filename)

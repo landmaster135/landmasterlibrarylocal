@@ -5,7 +5,7 @@ import os, sys, platform
 # IMPORT module FROM LandmasterLibrary
 import input_controller
 # import dir_editor
-from dir_editor import decide_seperator, generate_file_name, decide_now_dir
+from dir_editor import decide_seperator, generate_file_name
 sep = decide_seperator() # String seperator of directory.
 
 
@@ -24,6 +24,12 @@ def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
     export_name   : String absolutely filename to export.
     '''
 
+    if type(file_name) != str:
+        raise TypeError("file_name must be str type.")
+    if type(extracted_dir) != str:
+        raise TypeError("extracted_dir must be str type.")
+    if type(playlist_type) != str:
+        raise TypeError("playlist_type must be str type.")
     head_windows = 'C:\\Users\\Riku\\Music\\MusicBee\\Music\\'
     head_walkman = '#EXTINF:,\n'
     head_android = '/sdcard/Music/Musik/'
@@ -48,11 +54,15 @@ def write_playlist(file_name : str, extracted_dir : str, playlist_type : str):
         f.write(data_line)
 
 
-def write_csv(target_file, target_list):
+def write_csv(target_file : str, target_list : list):
     '''
     target_file : String absolutely filename of target file.
     target_list : List of contents to write.
     '''
+    if type(target_file) != str:
+        raise TypeError("target_file must be str type.")
+    if type(target_list) != list:
+        raise TypeError("target_list must be list type.")
     # write 1 line.
     with open(target_file, mode='a') as f:
         for m in range(0, len(target_list)):
@@ -63,18 +73,23 @@ def write_csv(target_file, target_list):
                 f.write("%s" % target_list[m])
         f.write("\n")
 
-def write_text(file_name, now_list):
+def write_text(file_name : str, now_list : list):
     '''
     file_name : String absolutely path of selected file
     now_list  : List of statement to write
     '''
+    if type(file_name) != str:
+        raise TypeError("file_name must be str type.")
+    if type(now_list) != list:
+        raise TypeError("now_list must be list type.")
     with open(file_name, 'w') as f:
         for n in now_list:
             f.write("%s\n" % n)
 
 def main():
+    args = sys.argv
     # test code for WriteText()
-    write_text(decide_now_dir(), ['apple', 'banana', 'orange'])
+    write_text(args[1], ['apple', 'banana', 'orange'])
 
 if __name__ == "__main__":
     main()

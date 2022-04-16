@@ -1,6 +1,7 @@
 # input_controller.py
 # code in shift-jis
 
+# Library by default
 import os, sys
 import re # regular expression
 
@@ -13,15 +14,17 @@ def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext :
     basefilename_without_ext : String name of calling file without extension.
     '''
     check_str = re.compile('[\\a-zA-Z0-9\-\_\.\-\s\:\~\^\=]+')
-    is_sjis_contained = False
+    does_sjis_contained_string_exist = False
     for i in target_str_list:
+        is_sjis_contained = False
         if check_str.fullmatch(i) == None:
+            does_sjis_contained_string_exist = True
             is_sjis_contained = True
         print('\nCheckWhetherSjisExists : targetStr is "{}" ・・・・・・ isSjisContained == {}'.format(i, is_sjis_contained))
 
     basefilename_without_ext = os.path.splitext(os.path.basename(callingfilename_with_ext))[0]
-    if is_sjis_contained == True:
-        print('\n\n{} exits because of the directory containing shift-jis character.'.format(basefilename_without_ext))
+    if does_sjis_contained_string_exist == True:
+        print(f'\n\n{basefilename_without_ext} exits because of the directory containing shift-jis character.')
         return True
     return False
 

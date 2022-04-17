@@ -156,7 +156,7 @@ python text_editor.py '/Users/landmaster/Downloads/test_folder/test.txt'
 # Diagram
 
 ```mermaid
-classDiagrams
+classDiagram
   input_controller <|-- file_list_getter
   dir_editor <|-- file_list_getter
   dir_editor <|-- text_editor

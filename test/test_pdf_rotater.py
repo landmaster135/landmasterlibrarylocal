@@ -2,4 +2,4 @@
 # Library by third party
 import pytest
 # Library by landmasterlibrary
-from src.landmasterlibrary.pdf_rotater import *
+from src.landmasterlibrarylocal.pdf_rotater import *

@@ -2,4 +2,4 @@
 # Library by third party
 import pytest
 # Library by landmasterlibrary
-from src.landmasterlibrary.file_list_getter import *
+from src.landmasterlibrarylocal.file_list_getter import *

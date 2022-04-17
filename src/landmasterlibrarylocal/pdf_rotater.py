@@ -4,7 +4,7 @@
 # Library by default
 import os, sys
 # Library by landmasterlibrary
-from dir_editor import decide_seperator, decide_now_dir, generate_file_name, make_directory
+from dir_editor import decide_seperator, generate_file_name, make_directory
 sep = decide_seperator() # String seperator of directory.
 from file_list_getter import get_file_list
 

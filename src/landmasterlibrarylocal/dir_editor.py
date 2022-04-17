@@ -1,10 +1,11 @@
 # dir_editor.py
-# code in shift-jis
 
 # Library by default
 import os, sys, platform
 import shutil, pathlib
 # Library by third party
+# nothing
+# Library by local
 # nothing
 # Library by landmasterlibrary
 # nothing
@@ -22,7 +23,7 @@ def generate_file_name(dir_name : str, sep : str, filename_with_ext : str) -> st
         raise TypeError("sep must be str type.")
     if type(filename_with_ext) != str:
         raise TypeError("filename_with_ext must be str type.")
-    generated_file_name = '{dirname}{sep}{filename}'.format(dirname=dir_name,sep=sep,filename=filename_with_ext)
+    generated_file_name = f'{dir_name}{sep}{filename_with_ext}'
     return generated_file_name
 
 def make_directory(file_name : str) -> str:
@@ -119,6 +120,8 @@ def decide_seperator() -> str:
         sep = '/'
     elif pf == 'Linux': # OS is Ubuntu
         sep = '/'
+    else:
+        raise OSError("Your OS is unknown.")
     return sep
 
 def move_files(src_paths : list, output_dir : str) -> bool:

@@ -1,5 +1,4 @@
 # file_list_getter.py
-# code in shift-jis
 
 # Library by default
 import os, sys, platform

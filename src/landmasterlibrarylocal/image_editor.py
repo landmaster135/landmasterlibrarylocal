@@ -136,7 +136,7 @@ def trim_image(target_dir : str, trimmed_img_ext : str = "jpg") -> bool:
     extracted_dir = make_directory(file_list[0])
 
     # Error Handling
-    if check_whether_sjis_exists([file_list[0], extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([file_list[0], extracted_dir]) == True:
         sys.exit(0)
 
     for i in range(0, len(file_list)):
@@ -244,7 +244,7 @@ def remove_duplication(folder_list : list):
     extracted_dir = os.path.dirname(folder_list[0])
 
     # Error Handling
-    if check_whether_sjis_exists([folder_list[0], extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([folder_list[0], extracted_dir]) == True:
         sys.exit(0)
 
     # Decide to remove or don't
@@ -310,7 +310,7 @@ def extract_image(video_name : str):
     extracted_dir = make_directory(video_name)
 
     # Error Handling
-    if check_whether_sjis_exists([video_name, extracted_dir], __file__) == True:
+    if check_whether_sjis_exists([video_name, extracted_dir]) == True:
         raise ValueError("video_name contained s-jis.")
 
     cap = cv2.VideoCapture(video_name)

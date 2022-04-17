@@ -2,10 +2,15 @@
 # code in shift-jis
 
 # Library by default
-import os, sys
-import re # regular expression
+import re
+# Library by third party
+# nothing
+# Library by local
+# nothing
+# Library by landmasterlibrary
+# nothing
 
-def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext : str) -> bool:
+def check_whether_sjis_exists(target_str_list : list) -> bool:
     '''
     target_str_list          : String List target for check.
     callingfilename_with_ext : String absolutely name of calling file with extension
@@ -15,8 +20,11 @@ def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext :
     '''
     if type(target_str_list) != list:
         raise TypeError("target_str_list must be list type.")
-    if type(callingfilename_with_ext) != str:
-        raise TypeError("callingfilename_with_ext must be str type.")
+    for i in target_str_list:
+        if type(i) != str:
+            raise TypeError("target_str_list's elements must be str type.")
+    # if type(calling_filename_with_ext) != str:
+    #     raise TypeError("callingfilename_with_ext must be str type.")
     check_str = re.compile('[\\a-zA-Z0-9\-\_\.\-\s\:\~\^\=]+')
     does_sjis_contained_string_exist = False
     for i in target_str_list:
@@ -26,9 +34,9 @@ def check_whether_sjis_exists(target_str_list : list, callingfilename_with_ext :
             is_sjis_contained = True
         print('\nCheckWhetherSjisExists : targetStr is "{}" ・・・・・・ isSjisContained == {}'.format(i, is_sjis_contained))
 
-    basefilename_without_ext = os.path.splitext(os.path.basename(callingfilename_with_ext))[0]
+    # basefilename_without_ext = os.path.splitext(os.path.basename(calling_filename_with_ext))[0]
     if does_sjis_contained_string_exist == True:
-        print(f'\n\n{basefilename_without_ext} exits because of the directory containing shift-jis character.')
+        # print(f'\n\n{basefilename_without_ext} exits because of the directory containing shift-jis character.')
         return True
     return False
 
@@ -45,6 +53,9 @@ def repeat_input_with_multi_choices(first_message : str, choice_list : list = []
         raise TypeError("first_message must be str type.")
     if type(choice_list) != list:
         raise TypeError("choice_list must be list type.")
+    for i in choice_list:
+        if type(i) != str:
+            raise TypeError("choice_list's elements must be str type.")
     is_input_correct = False
     is_first_input   = True
     input_message   = ''

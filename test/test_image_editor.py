@@ -2,4 +2,4 @@
 # Library by third party
 import pytest
 # Library by landmasterlibrary
-from src.landmasterlibrary.image_editor import *
+from src.landmasterlibrarylocal.image_editor import *

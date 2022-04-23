@@ -461,16 +461,6 @@ def convert_image_format_in_folder(src_dir : str, output_dir : str = "outputs", 
     if type(dest_ext) != str:
         raise TypeError("dest_ext must be str type.")
 
-    # src_ext_another = ""
-    # if src_ext.isupper():
-    #     src_ext_another = src_ext.lower()
-    # elif src_ext.islower():
-    #     src_ext_another = src_ext.upper()
-    # src_exts = [src_ext, src_ext_another]
-    # files = []
-    # for ext in src_exts:
-    #     files_now = get_file_list(src_dir, ext)
-    #     files.extend(files_now)
     files = get_file_list(src_dir, src_ext)
     print(files)
 

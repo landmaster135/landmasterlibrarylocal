@@ -173,9 +173,19 @@ def edit_file_name(dir_full_path : str):
 
 def get_file_list(folder_dir : str, ext : str) -> list:
     '''
-    folder_dir  : String selected folder's absolutely directory.
-    ext         : String extension
-    folder_list : List about selected folder
+    Getting files in spite of upper and lower extension.
+
+    Parameters
+    ----------
+    folder_dir : str
+        selected folder's absolutely directory.
+    ext : str
+        extension
+
+    Returns
+    -------
+    file_list : list
+        list of name of file.
     '''
     if type(folder_dir) != str:
         raise TypeError("folder_dir must be str type.")
@@ -186,15 +196,15 @@ def get_file_list(folder_dir : str, ext : str) -> list:
         sys.exit(0)
 
     file_name = generate_file_name(folder_dir, sep, f'*.{ext}')
-    folder_list = glob2.glob(file_name)
+    file_list = glob2.glob(file_name)
 
     # sort order of list is irregulary if you use "glob"
-    list.sort(folder_list, reverse=False)
+    list.sort(file_list, reverse=False)
     print(f'Get file list in this folder.\n"{folder_dir}"\n\n........................\n')
     # Get list about files.
-    for file in folder_list:
+    for file in file_list:
         print(file)
-    return folder_list
+    return file_list
 
 def main():
     args = sys.argv

@@ -490,9 +490,8 @@ def main():
     # trim_image(str(args[1]), 'jpg')
 
     # test code for remove_duplication()
-    # file_list = get_file_list(decide_now_dir(),'jpg')
-    file_list = get_file_list(str(args[1]),'jpg')
-    remove_duplication(file_list)
+    # file_list = get_file_list(str(args[1]),'jpg')
+    # remove_duplication(file_list)
 
     # test code for extract_image()
     # list_of_ext = ["mp4"]
@@ -500,7 +499,7 @@ def main():
 
     # test code for convert_image_format_in_folder()
     # convert_image_format_in_folder(str(args[1]))
-    # convert_image_format_in_folder(str(args[1]), 'png', 'jpg')
+    convert_image_format_in_folder(str(args[1]), 'outputs', 'png', 'jpg')
 
 if __name__ == "__main__":
     main()

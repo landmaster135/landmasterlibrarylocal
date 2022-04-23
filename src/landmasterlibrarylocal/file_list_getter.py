@@ -185,11 +185,12 @@ def get_file_list(folder_dir : str, ext : str) -> list:
         print("ERROR: No directory is selected.")
         sys.exit(0)
 
-    folder_list = glob2.glob(generate_file_name(folder_dir, sep, '*.{ext}'.format(ext=ext)))
+    file_name = generate_file_name(folder_dir, sep, f'*.{ext}')
+    folder_list = glob2.glob(file_name)
 
     # sort order of list is irregulary if you use "glob"
     list.sort(folder_list, reverse=False)
-    print('Get file list in this folder.\n"', folder_dir, '"\n\n........................\n')
+    print(f'Get file list in this folder.\n"{folder_dir}"\n\n........................\n')
     # Get list about files.
     for file in folder_list:
         print(file)

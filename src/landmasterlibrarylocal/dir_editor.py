@@ -127,6 +127,8 @@ def decide_seperator() -> str:
 def move_files(src_paths : list, output_dir : str) -> bool:
     if type(src_paths) != list:
         raise TypeError("src_paths must be list type.")
+    if len(src_paths) == 0:
+        raise ValueError("Length of src_paths must be more than 0.")
     if type(output_dir) != str:
         raise TypeError("output_dir must be str type.")
     src_dir = str(pathlib.Path(src_paths[0]).parent)

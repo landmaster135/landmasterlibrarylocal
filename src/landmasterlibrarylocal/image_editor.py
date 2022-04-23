@@ -434,11 +434,15 @@ def convert_image_format(file_name : str, src_ext : str = "png", dest_ext : str 
         raise TypeError("src_ext must be str type.")
     if type(dest_ext) != str:
         raise TypeError("dest_ext must be str type.")
-    if f".{src_ext}" not in file_name:
-        raise ValueError("ValueError: src_ext must be contained by file_name.")
+    # if f".{src_ext}" not in file_name:
+    if f".{src_ext.lower()}" not in file_name:
+        if f".{src_ext.upper()}" not in file_name:
+            raise ValueError("ValueError: src_ext must be contained by file_name.")
+        src_ext = src_ext.upper()
     file_name_without_ext = file_name.replace(f".{src_ext}", "")
     im = Image.open(f"{file_name_without_ext}.{src_ext}")
-    im = im.convert("RGB")
+    if src_ext in ["png", "PNG"]:
+        im = im.convert("RGB")
     src_path = f"{file_name_without_ext}.{dest_ext}"
     im.save(src_path)
     # dest_path = f"{str(pathlib.Path(src_path).parent)}/{output_dir}"
@@ -456,8 +460,19 @@ def convert_image_format_in_folder(src_dir : str, output_dir : str = "outputs", 
         raise TypeError("src_ext must be str type.")
     if type(dest_ext) != str:
         raise TypeError("dest_ext must be str type.")
-    # files = get_file_list(folder_dir, src_ext)
+
+    # src_ext_another = ""
+    # if src_ext.isupper():
+    #     src_ext_another = src_ext.lower()
+    # elif src_ext.islower():
+    #     src_ext_another = src_ext.upper()
+    # src_exts = [src_ext, src_ext_another]
+    # files = []
+    # for ext in src_exts:
+    #     files_now = get_file_list(src_dir, ext)
+    #     files.extend(files_now)
     files = get_file_list(src_dir, src_ext)
+    print(files)
 
     converted_image_files = []
     try:
